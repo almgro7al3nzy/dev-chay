@@ -1,23 +1,22 @@
-# Private messaging with Socket.IO
 
-Please read the related guide:
+# Socket.IO Chat
 
-- [Part I](https://socket.io/get-started/private-messaging-part-1/): initial implementation
-- [Part II](https://socket.io/get-started/private-messaging-part-2/): persistent user ID
-- [Part III](https://socket.io/get-started/private-messaging-part-3/): persistent messages
-- [Part IV](https://socket.io/get-started/private-messaging-part-4/): scaling up
+A simple chat demo for Socket.IO
 
-## Running the frontend
+## How to use
 
 ```
-npm install
-npm run serve
+$ npm i
+$ npm start
 ```
 
-### Running the server
+And point your browser to `http://localhost:3000`. Optionally, specify
+a port by supplying the `PORT` env variable.
 
-```
-cd server
-npm install
-npm start
-```
+## Features
+
+- Multiple users can join a chat room by each entering a unique username
+on website load.
+- Users can type chat messages to the chat room.
+- A notification is sent to all users when a user joins or leaves
+the chatroom.
