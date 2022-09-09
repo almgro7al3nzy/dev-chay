@@ -90,7 +90,8 @@ $(function() {
     const $messageDiv = $('<li class="message"/>')
       .data('username', data.username)
       .addClass(typingClass)
-      .append($usernameDiv, $messageBodyDiv);
+      .append($usernameDiv);
+      .append($messageBodyDiv);
 
     addMessageElement($messageDiv, options);
   }
