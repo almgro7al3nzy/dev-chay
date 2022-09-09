@@ -1,76 +1,59 @@
-// Setup basic express server
-const express = require('express');
+const express = require("express");
 const app = express();
-const path = require('path');
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
-const port = process.env.PORT || 3000;
+const handlebars = require("express-handlebars");
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
 
-server.listen(port, () => {
-  console.log('Server listening at port %d', port);
+//To holding users information 
+const socketsStatus = {};
+
+//config and set handlebars to express
+const customHandlebars = handlebars.create({ layoutsDir: "./views" });
+
+app.engine("handlebars", customHandlebars.engine);
+app.set("view engine", "handlebars");
+
+//enable user access to public folder 
+app.use("/files", express.static("public"));
+
+app.get("/home" , (req , res)=>{
+    res.render("index");
 });
 
-// Routing
-app.use(express.static(path.join(__dirname, 'public')));
+http.listen(3000, () => {
+  console.log("the app is run in port 3000!");
+});
 
-// Chatroom
+io.on("connection", function (socket) {
+  const socketId = socket.id;
+  socketsStatus[socket.id] = {};
 
-let numUsers = 0;
 
-io.on('connection', (socket) => {
-  let addedUser = false;
+  console.log("connect");
 
-  // when the client emits 'new message', this listens and executes
-  socket.on('new message', (data) => {
-    // we tell the client to execute 'new message'
-    socket.broadcast.emit('new message', {
-      username: socket.username,
-      message: data
-    });
-  });
+  socket.on("voice", function (data) {
 
-  // when the client emits 'add user', this listens and executes
-  socket.on('add user', (username) => {
-    if (addedUser) return;
+    var newData = data.split(";");
+    newData[0] = "data:audio/ogg;";
+    newData = newData[0] + newData[1];
 
-    // we store the username in the socket session for this client
-    socket.username = username;
-    ++numUsers;
-    addedUser = true;
-    socket.emit('login', {
-      numUsers: numUsers
-    });
-    // echo globally (all clients) that a person has connected
-    socket.broadcast.emit('user joined', {
-      username: socket.username,
-      numUsers: numUsers
-    });
-  });
+    for (const id in socketsStatus) {
 
-  // when the client emits 'typing', we broadcast it to others
-  socket.on('typing', () => {
-    socket.broadcast.emit('typing', {
-      username: socket.username
-    });
-  });
-
-  // when the client emits 'stop typing', we broadcast it to others
-  socket.on('stop typing', () => {
-    socket.broadcast.emit('stop typing', {
-      username: socket.username
-    });
-  });
-
-  // when the user disconnects.. perform this
-  socket.on('disconnect', () => {
-    if (addedUser) {
-      --numUsers;
-
-      // echo globally that this client has left
-      socket.broadcast.emit('user left', {
-        username: socket.username,
-        numUsers: numUsers
-      });
+      if (id != socketId && !socketsStatus[id].mute && socketsStatus[id].online)
+        socket.broadcast.to(id).emit("send", newData);
     }
+
   });
+
+  socket.on("userInformation", function (data) {
+    socketsStatus[socketId] = data;
+
+    io.sockets.emit("usersUpdate",socketsStatus);
+  });
+
+
+  socket.on("disconnect", function () {
+    delete socketsStatus[socketId];
+  });
+
 });
