@@ -225,7 +225,7 @@ $(function() {
   socket.on('login', (data) => {
     connected = true;
     // Display the welcome message
-    const message = 'مرحبًا بك في Socket.IO Chat -';
+    const message = 'Welcome to Socket.IO Chat – ';
     log(message, {
       prepend: true
     });
@@ -261,18 +261,18 @@ $(function() {
   });
 
   socket.on('disconnect', () => {
-    log('لقد تم قطع الاتصال');
+    log('you have been disconnected');
   });
 
   socket.io.on('reconnect', () => {
-    log('لقد تم إعادة الاتصال');
+    log('you have been reconnected');
     if (username) {
       socket.emit('add user', username);
     }
   });
 
   socket.io.on('reconnect_error', () => {
-    log('فشلت محاولة إعادة الاتصال');
+    log('attempt to reconnect has failed');
   });
 
 });
