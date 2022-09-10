@@ -1,2 +1,4 @@
-.env
-node_modules/
+desktop.ini
+node_modules
+.vscode
+server/users
