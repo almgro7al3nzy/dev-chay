@@ -1,31 +1,19 @@
-Socket.io Chatroom
-===
+# Backend for chat application using socket.io
 
-A simple chat application built in [Node.js](https://nodejs.org) using [Express](http://expressjs.com/) and [Socket.IO](https://socket.io/). I'm also using [Foundation Zurb](http://foundation.zurb.com/) for the front-end and [Moment.js](http://momentjs.com/) to display the date and time.
+You can test the live app [here](https://chattrio.netlify.app/). 
+The front end for this application can be found [here](https://github.com/AkileshAro/chat-client).
 
-View **live demo** here: [https://socketio-chatroom.herokuapp.com](https://socketio-chatroom.herokuapp.com/)
+## Libraries used :
+- Express 
+- Socket.io
+- Node.JS Http server
+- Cors
 
-Installation
-===
+## Installation Process : 
+1. Clone/Download the project.
+2. Open the project directory on your machine using terminal or a code editor of your choice and type `npm i`
+3. Once the packages are installed, type `npm start` and you'll be able to see the server up and running on your local host.
 
-#### 1. Clone the Repository
+Cheers :+1: 
 
-```sh
-git clone https://github.com/moniba-ali/socketio-chatroom.git
-cd socketio-chatroom
-```
-
-#### 2. Install the Dependencies
-
-```sh
-npm install
-```
-
-#### 3. Start the Server
-
-```sh
-npm start
-```
-
-> View on localhost:3000
-
+  
