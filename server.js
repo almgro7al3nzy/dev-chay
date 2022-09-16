@@ -45,7 +45,7 @@ io.on('connection', function(socket) {
 				socket.join(req.room);
 				socket.broadcast.to(req.room).emit('message', {
 					username: 'System',
-					text: req.username + 'وقد انضمت!',
+					text: req.username + 'انضم الى الغرفة!',
 					timestamp: moment().valueOf()
 				});
 				callback({
