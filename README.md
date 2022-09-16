@@ -1,31 +1,15 @@
-Socket.io Chatroom
-===
+# chat-example
 
-A simple chat application built in [Node.js](https://nodejs.org) using [Express](http://expressjs.com/) and [Socket.IO](https://socket.io/). I'm also using [Foundation Zurb](http://foundation.zurb.com/) for the front-end and [Moment.js](http://momentjs.com/) to display the date and time.
+This is the source code for a very simple chat example used for
+the [Getting Started](http://socket.io/get-started/chat/) guide
+of the Socket.IO website.
 
-View **live demo** here: [https://socketio-chatroom.herokuapp.com](https://socketio-chatroom.herokuapp.com/)
+Please refer to it to learn how to run this application.
 
-Installation
-===
+You can also spin up a free Heroku dyno to test it out:
 
-#### 1. Clone the Repository
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/socketio/chat-example)
 
-```sh
-git clone https://github.com/moniba-ali/socketio-chatroom.git
-cd socketio-chatroom
-```
+Or run it on [Repl.it](https://repl.it/):
 
-#### 2. Install the Dependencies
-
-```sh
-npm install
-```
-
-#### 3. Start the Server
-
-```sh
-npm start
-```
-
-> View on localhost:3000
-
+[![Run on Repl.it](https://repl.it/badge/github/socketio/chat-example)](https://repl.it/github/socketio/chat-example)
