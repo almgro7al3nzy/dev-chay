@@ -1,22 +1,19 @@
+# Backend for chat application using socket.io
 
-# Socket.IO Chat
+You can test the live app [here](https://chattrio.netlify.app/). 
+The front end for this application can be found [here](https://github.com/AkileshAro/chat-client).
 
-A simple chat demo for Socket.IO
+## Libraries used :
+- Express 
+- Socket.io
+- Node.JS Http server
+- Cors
 
-## How to use
+## Installation Process : 
+1. Clone/Download the project.
+2. Open the project directory on your machine using terminal or a code editor of your choice and type `npm i`
+3. Once the packages are installed, type `npm start` and you'll be able to see the server up and running on your local host.
 
-```
-$ npm i
-$ npm start
-```
+Cheers :+1: 
 
-And point your browser to `http://localhost:3000`. Optionally, specify
-a port by supplying the `PORT` env variable.
-
-## Features
-
-- Multiple users can join a chat room by each entering a unique username
-on website load.
-- Users can type chat messages to the chat room.
-- A notification is sent to all users when a user joins or leaves
-the chatroom.
+  
