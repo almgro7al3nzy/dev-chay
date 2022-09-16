@@ -9,7 +9,7 @@ var connectedUsers = {};
 app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function(socket) {
-	console.log('A user is connected.');
+	console.log('مستخدم متصل.');
 
 	socket.on('disconnect', function() {
 		var userData = connectedUsers[socket.id];
@@ -17,7 +17,7 @@ io.on('connection', function(socket) {
 			socket.leave(connectedUsers[socket.id]);
 			io.to(userData.room).emit('message', {
 				username: 'System',
-				text: userData.username + 'غادر!',
+				text: userData.username + 'ل غادر الغرفة!',
 				timestamp: moment().valueOf()
 			});
 			delete connectedUsers[socket.id];
@@ -72,7 +72,11 @@ io.on('connection', function(socket) {
 	});
 
 });
-
+io.on("connection", socket => {
+  socket.on("private message", (anotherSocketId, msg) => {
+    socket.to(anotherSocketId).emit("private message", socket.id, msg);
+  });
+});
 http.listen(PORT, function() {
 	console.log('بدأ الخادم في المنفذ ' + PORT);
 });

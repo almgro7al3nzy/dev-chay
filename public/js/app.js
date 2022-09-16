@@ -15,7 +15,7 @@ socket.on('connect', function() {
 			room: $room
 		}, function(data) {
 			if (data.nameAvailable) {
-				$(".room-title").text('You are in the room: ' + $room);
+				$(".room-title").text('انت في الغرفة: ' + $room);
 				$messageArea.show();
 				$loginArea.hide('slow');
 			} else {
@@ -46,7 +46,7 @@ $msgForm.on('submit', function(e) {
 	var $username = $loginForm.find('input[name=username]');
 	var reg = /<(.|\n)*?>/g;
 	if (reg.test($message.val()) == true) {
-		alert('Sorry, that is not allowed!');
+		alert('عذرا، هذا غير مسموح به!');
 	} else {
 		socket.emit('message', {
 			username: $.trim($username.val()),
