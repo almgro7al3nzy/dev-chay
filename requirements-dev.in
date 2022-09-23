@@ -1,6 +1,0 @@
--c requirements.txt
-virtualenvwrapper
-pip-tools
-pipenv
-pre-commit
-honcho
