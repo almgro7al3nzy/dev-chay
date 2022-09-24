@@ -1,8 +1,0 @@
-- name: Main
-  link: /
-- name: Info
-  link: /about.html
-- name: Projects
-  link: /blog.html
-- name: Contact
-  link: /staff.html

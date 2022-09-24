@@ -1,56 +1,65 @@
----
-layout: default
-title: Home
----
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>{{ page.title }}</title>
-    <link rel="stylesheet" href="/assets/css/styles.css">
-  </head>
-  <body>
-    <h1>{{ "Welcome !" | upcase }}</h1>
-    <ul class="pages">
-      <li class="chat page">
-        <div class="usernametext" id="usernametext">User Name:</div>
-        <div class="chatArea">
-          <ul class="messages"></ul>
-        </div>
-        <input class="inputMessage" placeholder="Type here..."/>
-      </li>
-      <li class="login page">
-        <div class="form">
-          <h3 class="title">Enter a username...</h3>
-          <input class="usernameInput" id="inputtext" type="text" maxlength="14" onsubmit="setname()"/>
-          <input type="submit" id="submitbutton" name="sumbitbutton" value="VERIFY">
-          <p id="demo"></p>
-        </div>
-      </li>
-    </ul>
+<head>
+  <meta charset="utf-8">
+  <title>Socket.io Chat Example</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container">
+    <h3>Socket.io Chat Example</h3>
+    <form class="form-inline">
+      <div class="form-group">
+        <label for="msgForm">Message: </label>
+        <input type="text" class="form-control" id="msgForm">
+      </div>
+      <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+    <div id="chatLogs"></div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+  $(function(){
+    // socket.io 서버에 접속한다
+    var socket = io();
 
-    <script>
-      //var inputname = " ";
-      function setname (){
-        var test = document.getElementById('inputtext').value;
-        console.log(test);
-        var test2 = document.getElementById('usernametext');
-        var final = test2 + " " + test;
-        //return test;
+    // 서버로 자신의 정보를 전송한다.
+    socket.emit("login", {
+      // name: "ungmo2",
+      name: makeRandomName(),
+      userid: "ungmo2@gmail.com"
+    });
+
+    // 서버로부터의 메시지가 수신되면
+    socket.on("login", function(data) {
+      $("#chatLogs").append("<div><strong>" + data + "</strong> has joined</div>");
+    });
+
+    // 서버로부터의 메시지가 수신되면
+    socket.on("chat", function(data) {
+      $("#chatLogs").append("<div>" + data.msg + " : from <strong>" + data.from.name + "</strong></div>");
+    });
+
+    // Send 버튼이 클릭되면
+    $("form").submit(function(e) {
+      e.preventDefault();
+      var $msgForm = $("#msgForm");
+
+      // 서버로 메시지를 전송한다.
+      socket.emit("chat", { msg: $msgForm.val() });
+      $msgForm.val("");
+    });
+
+    function makeRandomName(){
+      var name = "";
+      var possible = "abcdefghijklmnopqrstuvwxyz";
+      for( var i = 0; i < 3; i++ ) {
+        name += possible.charAt(Math.floor(Math.random() * possible.length));
       }
-      console.log("lol");
-      
-      //console.log(inputname);
-      //document.getElementById('usernametext').innerHTML = setname(inputname);
-      //console.log(inputname);
-    </script>
-
-
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="socket.io/socket.io.js"></script>
-    <script src="public/main.js"></script>
-
-   
-      
-  </body>
+      return name;
+    }
+  });
+  </script>
+</body>
 </html>
