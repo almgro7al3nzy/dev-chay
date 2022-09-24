@@ -54,6 +54,9 @@ io.on('connection', (socket) => {
     });
   });
 
+socket.emit("update item", "1", { name: "updated" }, (response) => {
+  console.log(response.status); // ok
+});
   // when the client emits 'stop typing', we broadcast it to others
   socket.on('stop typing', () => {
     socket.broadcast.emit('stop typing', {
