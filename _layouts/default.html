@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  
+<head>
+    
+  <meta charset="utf-8">
+    
+  <title>{{ page.title }}</title>
+    
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  
+</head>
+
+<p id="test"></p>
+<div class="counter" id="counter">Just Arrived.</div>
+
+<script>
+  var seconds = 0;
+  var min = 0;
+  var el = document.getElementById('counter');
+
+  function incrementSeconds() 
+  {
+    seconds += 1;
+    if(seconds>1){
+    el.innerText = "You have been here for " + seconds + " seconds.";
+    }
+  // if(seconds>60){
+  //     seconds = 0;
+  //     min += 1;
+  //     el.innerHTML += "You have been here for " + min + " min: " + seconds + " seconds";
+      
+  // }
+  }
+
+
+var cancel = setInterval(incrementSeconds, 1000);
+
+
+document.body.style.backgroundColor = "darkblue";
+</script>
+<div class="colorStuff">
+<h2 class="bgChanger">Background Color Selector!</h2>
+<input type="color" id="colorInput">
+<button id="colorButton" class="colorButton" value="click to change!" onclick="changeColor()">Click to Change!
+ </div>
+
+<script>
+  document.body.style.backgroundImage = "";
+  function changeColor(){
+    let color = document.getElementById("colorInput").value;
+    document.body.style.backgroundColor = color;
+  }
+</script>
+
+</html>
+
+  
+<body>
+    {% include navigation.html %}
+    {{ content }}
+  
+</body>
+
+<!---
+<h2 class="masterhead">
+  {{ content }}
+<h2>
+ !---> 

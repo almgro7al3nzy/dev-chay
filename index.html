@@ -1,0 +1,56 @@
+---
+layout: default
+title: Home
+---
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{ page.title }}</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+  </head>
+  <body>
+    <h1>{{ "Welcome !" | upcase }}</h1>
+    <ul class="pages">
+      <li class="chat page">
+        <div class="usernametext" id="usernametext">User Name:</div>
+        <div class="chatArea">
+          <ul class="messages"></ul>
+        </div>
+        <input class="inputMessage" placeholder="Type here..."/>
+      </li>
+      <li class="login page">
+        <div class="form">
+          <h3 class="title">Enter a username...</h3>
+          <input class="usernameInput" id="inputtext" type="text" maxlength="14" onsubmit="setname()"/>
+          <input type="submit" id="submitbutton" name="sumbitbutton" value="VERIFY">
+          <p id="demo"></p>
+        </div>
+      </li>
+    </ul>
+
+    <script>
+      //var inputname = " ";
+      function setname (){
+        var test = document.getElementById('inputtext').value;
+        console.log(test);
+        var test2 = document.getElementById('usernametext');
+        var final = test2 + " " + test;
+        //return test;
+      }
+      console.log("lol");
+      
+      //console.log(inputname);
+      //document.getElementById('usernametext').innerHTML = setname(inputname);
+      //console.log(inputname);
+    </script>
+
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="public/main.js"></script>
+
+   
+      
+  </body>
+</html>
