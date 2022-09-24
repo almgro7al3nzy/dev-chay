@@ -1,79 +1,74 @@
-// Setup basic express server
-const express = require('express');
-const app = express();
+
 const path = require('path');
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
-const port = process.env.PORT || 3000;
+const http = require('http');
+const express = require('express');
+const socketio = require('socket.io');
+const formatMessage = require('./helpers/formatDate')
+const {
+  getActiveUser,
+  exitRoom,
+  newUser,
+  getIndividualRoomUsers
+} = require('./helpers/userHelper');
 
-server.listen(port, () => {
-  console.log('Server listening at port %d', port);
-});
+const app = express();
+const server = http.createServer(app);
+const io = socketio(server);
 
-// Routing
+//تعيين الدليل العام
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Chatroom
+// سيتم تشغيل هذه الكتلة عند اتصال العميل
+io.on('connection', socket => {
+  socket.on('joinRoom', ({ username, room }) => {
+    const user = newUser(socket.id, username, room);
 
-let numUsers = 0;
+    socket.join(user.room);
 
-io.on('connection', (socket) => {
-  let addedUser = false;
+    // عام أهلا وسهلا
+    socket.emit('message', formatMessage("WebCage", 'Messages are limited to this room! '));
 
-  // when the client emits 'new message', this listens and executes
-  socket.on('new message', (data) => {
-    // we tell the client to execute 'new message'
-    socket.broadcast.emit('new message', {
-      username: socket.username,
-      message: data
+    // بث في كل مرة يتصل فيها المستخدمون
+    socket.broadcast
+      .to(user.room)
+      .emit(
+        'message',
+        formatMessage("WebCage", `${user.username} has joined the room`)
+      );
+
+    //المستخدمون النشطون الحاليون واسم الغرفة
+    io.to(user.room).emit('roomUsers', {
+      room: user.room,
+      users: getIndividualRoomUsers(user.room)
     });
   });
 
-  // when the client emits 'add user', this listens and executes
-  socket.on('add user', (username) => {
-    if (addedUser) return;
+  //استمع إلى رسالة العميل
+  socket.on('chatMessage', msg => {
+    const user = getActiveUser(socket.id);
 
-    // we store the username in the socket session for this client
-    socket.username = username;
-    ++numUsers;
-    addedUser = true;
-    socket.emit('login', {
-      numUsers: numUsers
-    });
-    // echo globally (all clients) that a person has connected
-    socket.broadcast.emit('user joined', {
-      username: socket.username,
-      numUsers: numUsers
-    });
+    io.to(user.room).emit('message', formatMessage(user.username, msg));
   });
 
-  // when the client emits 'typing', we broadcast it to others
-  socket.on('typing', () => {
-    socket.broadcast.emit('typing', {
-      username: socket.username
-    });
-  });
-
-socket.emit("update item", "1", { name: "updated" }, (response) => {
-  console.log(response.status); // ok
-});
-  // when the client emits 'stop typing', we broadcast it to others
-  socket.on('stop typing', () => {
-    socket.broadcast.emit('stop typing', {
-      username: socket.username
-    });
-  });
-
-  // when the user disconnects.. perform this
+  //يعمل عند قطع اتصال العميل
   socket.on('disconnect', () => {
-    if (addedUser) {
-      --numUsers;
+    const user = exitRoom(socket.id);
 
-      // echo globally that this client has left
-      socket.broadcast.emit('user left', {
-        username: socket.username,
-        numUsers: numUsers
+    if (user) {
+      io.to(user.room).emit(
+        'message',
+        formatMessage("WebCage", `${user.username} has left the room`)
+      );
+
+      // المستخدمون النشطون الحاليون واسم الغرفة
+      io.to(user.room).emit('roomUsers', {
+        room: user.room,
+        users: getIndividualRoomUsers(user.room)
       });
     }
   });
 });
+
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
