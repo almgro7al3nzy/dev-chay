@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+
+<head>
+
+  <title>Socket Chat Web Login Portal</title>
+  <!-- Include CSS File Here -->
+  <link rel="stylesheet" href="style.css" />
+
+</head>
+<body>
+<div class="login-page">
+  <div class="form">
+    <form class="register-form">
+      <input type="text" placeholder="First name" id="first_name" />
+      <input type="text" placeholder="Last name" id="last_name" />
+      <input type="text" placeholder="Email address" id="email" />
+      <input type="password" placeholder="Password" id="password" />
+      <button type="submit">create</button>
+      <p class="message" onclick="onRedirectLoginPage()">Already has account?<a href="#">Login</a></p>
+    </form>
+    <form class="login-form">
+      <input type="text" placeholder="Email address" id="email_login"/>
+      <input type="password" placeholder="Password" id="password_login"/>
+      <button type="submit">login</button>
+      <p class="message" onclick="onRedirectRegisterPage()">Not registered? <a href="#">Create an account</a></p>
+    </form>
+  </div>
+</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- Include JS File Here -->
+  <script src="login.js"></script>
+</body>
+</html>
