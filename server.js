@@ -1,28 +1,155 @@
-var app = require('express')();
-var server = require('http').createServer(app);
-// http server를 socket.io server로 upgrade한다
-var io = require('socket.io')(server);
+const express = require('express');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const colors = require('colors');
+const socketIO = require('socket.io');
+const cors = require('cors');
+const path = require('path');
 
-// localhost:3000으로 서버에 접속하면 클라이언트로 index.html을 전송한다
-app.get('/', function(req, res) {
-  res.sendFile(__dirname + '/index-room.html');
+const usersRoutes = require('./routes/api/users');
+// const socialAuthRoutes = require('./routes/api/socialAuth');
+const chatMessageRoutes = require('./routes/api/chatMessages');
+const imageUpload = require('./utils/imageUpload').router;
+
+const formatMessage = require('./utils/chatMsgs');
+const { userJoin, getCurrentUser } = require('./utils/chatUsers');
+
+// load chat channel model
+const chatChannel = require('./models/ChatChannel');
+
+const botName = 'ChatApp Bot';
+
+const app = express();
+const server = require('http').createServer(app);
+// app.use(cors());
+// const io = socketIO(server);
+const io = socketIO(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    transports: ['websocket', 'polling'],
+    credentials: true,
+  },
+  allowEIO3: true,
 });
 
-// namespace /chat에 접속한다.
-var chat = io.of('/chat').on('connection', function(socket) {
-  socket.on('chat message', function(data){
-    console.log('message from client: ', data);
+//database connection
+const DB = require('./config/keys').mongoURI;
+mongoose
+  .connect(DB, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useFindAndModify: false,
+  })
+  .then(() => console.log('Connected to database'.random))
+  .catch((err) => console.log(err));
 
-    var name = socket.name = data.name;
-    var room = socket.room = data.room;
+//body parser
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-    // room에 join한다
-    socket.join(room);
-    // room에 join되어 있는 클라이언트에게 메시지를 전송한다
-    chat.to(room).emit('chat message', data.msg);
+//express session middleware
+app.use(
+  session({
+    secret: require('./config/keys').secretOrKey,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 60000 * 60,
+    },
+    // store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    store: MongoStore.create({
+      mongoUrl: DB,
+      collectionName: 'sessions',
+    }),
+  })
+);
+
+//passport middleware
+app.use(passport.initialize());
+// deserialize cookie from the browser
+app.use(passport.session());
+
+//passport config
+require('./config/passport')(passport);
+
+// app.get('/', (req, res) => {
+//   res.send('Welcome to chat group backend');
+// });
+
+// use routes
+app.use('/api/users', usersRoutes);
+app.use('/api/chat-message', chatMessageRoutes);
+app.use('/user/profile-image', imageUpload);
+
+//server static assets if in production
+if (process.env.NODE_ENV === 'production') {
+  //set static folder
+  app.use(express.static('client/build'));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
   });
+}
+
+const port = process.env.PORT || 5000;
+
+server.listen(port, () => {
+  console.log(`Server running @port ${port}`.magenta);
 });
 
-server.listen(3000, function() {
-  console.log('Socket IO server listening on port 3000');
+//run when client connects
+io.on('connection', (socket) => {
+  // //listen for chat room and user
+  socket.on('joinRoom', ({ username, channelName, userPhoto }) => {
+    const user = userJoin(socket.id, username, channelName, userPhoto);
+
+    socket.join(user.channelName);
+
+    let welcomeMsg;
+    // let welcomeMsg = `Welcome to ${user.channelName.toLowerCase()} channel`;
+    if (user.channelName === 'welcome') {
+      welcomeMsg = 'Welcome to ChatApp!!!';
+    } else {
+      welcomeMsg = `Welcome to ${user.channelName.toLowerCase()} channel`;
+    }
+
+    // welcome current user
+    socket.emit('message', formatMessage(botName, welcomeMsg));
+
+    //broacast msg when other users connect
+    socket.broadcast
+      .to(user.channelName)
+      .emit(
+        'message',
+        formatMessage(botName, `${user.username} joined the chat`)
+      );
+  });
+
+  //Listen for chat message
+  socket.on('chatMessage', (msg) => {
+    const user = getCurrentUser(socket.id);
+
+    // console.log(user, 'user details');
+
+    io.to(user.channelName).emit(
+      'message',
+      formatMessage(user.username, msg, user.userPhoto)
+    );
+
+    // console.log(formatMessage(user.username, msg, user.userPhoto))
+  });
+
+  // //broadcast when a user connects
+  // socket.broadcast.emit('message', 'A user has joined the chat');
+
+  //Runs when client disconnects
+  socket.on('disconnect', () => {
+    // console.log('disconnected')
+    // send msg to everyone
+    // console.log(user.channelName);
+    io.emit('message', formatMessage(botName, 'A user left the chat'));
+  });
 });
