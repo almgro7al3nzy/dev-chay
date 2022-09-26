@@ -25,11 +25,12 @@ io.on('connection', (socket) => {
           message: data
         });
     });
-    //console.log(socket.id, "a user connected to server!");
+    console.log(socket.id, "a user connected to server!");
 
     // when the client emits 'add user', this listens and executes
     socket.on('add user', (username) => {
         if (addedUser) return;
+    socket.emit('message', formatMessage("WebCage", 'Messages are limited to this room! '));
 
         // we store the username in the socket session for this client
         socket.username = username;
