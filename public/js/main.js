@@ -6,18 +6,18 @@ const userList = document.getElementById('users');
 //احصل على اسم المستخدم والغرفة من URL
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
-}, options);
+});
 
-console.log({username, room}, options)
+console.log({username, room})
 
 const socket = io();
 
 //انضم إلى غرف الدردشة
-socket.emit('joinRoom', { username, room }, options);
+socket.emit('joinRoom', { username, room });
       socket.emit('add user', username);
 
 //احصل على الغرفة والمستخدمين
-socket.on('roomUsers', ({ room, users }, options) => {
+socket.on('roomUsers', ({ room, users }) => {
   outputRoomName(room);
   outputUsers(users);
 });
@@ -34,7 +34,7 @@ socket.on('message', (message) => {
 //إرسال الرسالة
 chatForm.addEventListener('submit', (e) => {
   e.preventDefault();
-    socket.emit('add user', username, options);
+    socket.emit('add user', username);
 
   //احصل على نص الرسالة
   let msg = e.target.elements.msg.value;
@@ -46,7 +46,7 @@ chatForm.addEventListener('submit', (e) => {
   }
 
   //إرسال رسالة إلى الخادم
-  socket.emit('chatMessage', msg, options);
+  socket.emit('chatMessage', msg);
 
   //مدخلات واضحة
   e.target.elements.msg.value = '';
@@ -66,7 +66,7 @@ function outputMessage(message) {
   para.classList.add('text');
   para.innerText = message.text;
   div.appendChild(para);
-  document.querySelector('.chat-messages').appendChild(div), options;
+  document.querySelector('.chat-messages').appendChild(div);
 
 }
 
@@ -95,4 +95,3 @@ document.getElementById('leave-btn').addEventListener('click', () => {
   } else {
   }
 });
-
