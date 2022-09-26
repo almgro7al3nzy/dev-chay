@@ -19,14 +19,14 @@ const io = socketio(server);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // سيتم تشغيل هذه الكتلة عند اتصال العميل
-io.on('connection', options, socket => {
+io.on('connection', socket => {
   socket.on('joinRoom', ({ username, room }) => {
     const user = newUser(socket.id, username, room);
 
     socket.join(user.room);
 
     // عام أهلا وسهلا
-    socket.emit('message', options, formatMessage("WebCage", 'Messages are limited to this room! '));
+    socket.emit('message', formatMessage("WebCage", 'Messages are limited to this room! '));
 
     // بث في كل مرة يتصل فيها المستخدمون
     socket.broadcast
@@ -37,21 +37,21 @@ io.on('connection', options, socket => {
       );
 
     //المستخدمون النشطون الحاليون واسم الغرفة
-    io.to(user.room).emit('roomUsers', options, {
+    io.to(user.room).emit('roomUsers', {
       room: user.room,
       users: getIndividualRoomUsers(user.room)
     });
   });
 
   //استمع إلى رسالة العميل
-  socket.on('chatMessage', options, msg => {
+  socket.on('chatMessage', msg => {
     const user = getActiveUser(socket.id);
 
     io.to(user.room).emit('message', formatMessage(user.username, msg));
   });
 
   //يعمل عند قطع اتصال العميل
-  socket.on('disconnect', options, () => {
+  socket.on('disconnect', () => {
     const user = exitRoom(socket.id);
 
     if (user) {
@@ -61,7 +61,7 @@ io.on('connection', options, socket => {
       );
 
       // المستخدمون النشطون الحاليون واسم الغرفة
-      io.to(user.room).emit('roomUsers', options, {
+      io.to(user.room).emit('roomUsers', {
         room: user.room,
         users: getIndividualRoomUsers(user.room)
       });
