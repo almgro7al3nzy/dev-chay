@@ -23,31 +23,31 @@ io.on('connection', options, socket => {
   socket.on('joinRoom', ({ username, room }) => {
     const user = newUser(socket.id, username, room);
 
-    socket.join(user.room, options);
+    socket.join(user.room);
 
     // عام أهلا وسهلا
-    socket.emit('message', formatMessage("WebCage", 'Messages are limited to this room! '));
+    socket.emit('message', options, formatMessage("WebCage", 'Messages are limited to this room! '));
 
     // بث في كل مرة يتصل فيها المستخدمون
     socket.broadcast
-      .to(user.room, options)
+      .to(user.room)
       .emit(
         'message',
-        formatMessage("WebCage", `${user.username} has joined the room`, options)
+        formatMessage("WebCage", `${user.username} has joined the room`)
       );
 
     //المستخدمون النشطون الحاليون واسم الغرفة
-    io.to(user.room).emit('roomUsers',, options {
+    io.to(user.room).emit('roomUsers', options, {
       room: user.room,
-      users: getIndividualRoomUsers(user.room, options)
+      users: getIndividualRoomUsers(user.room)
     });
   });
 
   //استمع إلى رسالة العميل
-  socket.on('chatMessage', msg , options=> {
+  socket.on('chatMessage', options, msg => {
     const user = getActiveUser(socket.id);
 
-    io.to(user.room).emit('message', formatMessage(user.username, msg, options));
+    io.to(user.room).emit('message', formatMessage(user.username, msg));
   });
 
   //يعمل عند قطع اتصال العميل
@@ -62,7 +62,7 @@ io.on('connection', options, socket => {
 
       // المستخدمون النشطون الحاليون واسم الغرفة
       io.to(user.room).emit('roomUsers', options, {
-        room: user.room, options,
+        room: user.room,
         users: getIndividualRoomUsers(user.room)
       });
     }
