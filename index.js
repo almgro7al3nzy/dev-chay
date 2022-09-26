@@ -39,7 +39,34 @@ io.on('connection', (socket) => {
         socket.emit('login', {
           numUsers: numUsers
         });
-        // echo globally (all clients) that a person has connected
+ 
+    //المستخدمون النشطون الحاليون واسم الغرفة
+    io.to(user.room).emit('roomUsers', {
+      room: user.room,
+      users: getIndividualRoomUsers(user.room)
+    });
+  });
+
+  //يعمل عند قطع اتصال العميل
+  socket.on('disconnect', () => {
+    const user = exitRoom(socket.id);
+
+    if (user) {
+      io.to(user.room).emit(
+        'message',
+        formatMessage("WebCage", `${user.username} has left the room`)
+      );
+
+      // المستخدمون النشطون الحاليون واسم الغرفة
+      io.to(user.room).emit('roomUsers', {
+        room: user.room,
+        users: getIndividualRoomUsers(user.room)
+      });
+    }
+  });
+});
+
+ // echo globally (all clients) that a person has connected
         socket.broadcast.emit('user joined', {
           username: socket.username,
           numUsers: numUsers
