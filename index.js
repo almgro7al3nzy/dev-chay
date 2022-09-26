@@ -1,74 +1,62 @@
-
-const path = require('path');
-const http = require('http');
 const express = require('express');
-const socketio = require('socket.io');
-const formatMessage = require('./helpers/formatDate')
-const {
-  getActiveUser,
-  exitRoom,
-  newUser,
-  getIndividualRoomUsers
-} = require('./helpers/userHelper');
 
-const app = express();
-const server = http.createServer(app);
-const io = socketio(server);
+var app = express();
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 
-//تعيين الدليل العام
-app.use(express.static(path.join(__dirname, 'public')));
+app.set('port', (process.env.PORT || 3000));
 
-// سيتم تشغيل هذه الكتلة عند اتصال العميل
-io.on('connection', socket => {
-  socket.on('joinRoom', ({ username, room }) => {
-    const user = newUser(socket.id, username, room);
+app.use(express.static(__dirname + '/public'));
 
-    socket.join(user.room);
+// views is directory for all template files
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
 
-    // عام أهلا وسهلا
-    socket.emit('message', formatMessage("WebCage", 'Messages are limited to this room! '));
+//console.log(express);
 
-    // بث في كل مرة يتصل فيها المستخدمون
-    socket.broadcast
-      .to(user.room)
-      .emit(
-        'message',
-        formatMessage("WebCage", `${user.username} has joined the room`)
-      );
+console.log("============== outside io ==============");
 
-    //المستخدمون النشطون الحاليون واسم الغرفة
-    io.to(user.room).emit('roomUsers', {
-      room: user.room,
-      users: getIndividualRoomUsers(user.room)
+var players = [];
+
+io.on('connection', function(socket){
+    console.log(socket.id, "a user connected to server!");
+    console.log(socket.rooms);
+    socket.on('connect_user', (account) => {
+        var player = {
+            //...socket,
+            id: socket.id,
+            account,
+            points: 0
+        }
+
+        players.push(player);
+
+        console.log(account.username, 'is now connected to server');
+
+        //display the players connected to server
+        console.log(players);
+
+        console.log("Connected_user: " + player.account.username);
+        //io.emit('connect_user', user);
+        socket.account = account;
+        console.log("socket.account.username: " + socket.account.username);
+        console.log("{ id: socket.id }: " + { id: socket.id } );
+        console.log("{ id: socket.id }: ", { id: socket.id } );
+        console.log("socket.id: " + socket.id);
+        console.log("socket.account: ", socket.account);
+        console.log(socket.account, " ", account)
     });
-  });
+    socket.emit('connect_user', { id: socket.id });
 
-  //استمع إلى رسالة العميل
-  socket.on('chatMessage', msg => {
-    const user = getActiveUser(socket.id);
-
-    io.to(user.room).emit('message', formatMessage(user.username, msg));
-  });
-
-  //يعمل عند قطع اتصال العميل
-  socket.on('disconnect', () => {
-    const user = exitRoom(socket.id);
-
-    if (user) {
-      io.to(user.room).emit(
-        'message',
-        formatMessage("WebCage", `${user.username} has left the room`)
-      );
-
-      // المستخدمون النشطون الحاليون واسم الغرفة
-      io.to(user.room).emit('roomUsers', {
-        room: user.room,
-        users: getIndividualRoomUsers(user.room)
-      });
-    }
-  });
+    socket.on('disconnect', function () {
+        //console.log("One of sockets disconnected from our server.")
+        console.log(socket.account.username, "disconnected from server.")
+    });
 });
 
-const PORT = process.env.PORT || 3000;
+//console.log(socket);
 
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(app.get('port'), function(){
+    console.log("Server is now running...");
+    console.log("Port is on", app.get('port'))
+});
