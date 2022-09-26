@@ -14,6 +14,7 @@ const socket = io();
 
 //انضم إلى غرف الدردشة
 socket.emit('joinRoom', { username, room });
+      socket.emit('add user', username);
 
 //احصل على الغرفة والمستخدمين
 socket.on('roomUsers', ({ room, users }) => {
@@ -33,6 +34,7 @@ socket.on('message', (message) => {
 //إرسال الرسالة
 chatForm.addEventListener('submit', (e) => {
   e.preventDefault();
+    socket.emit('add user', username);
 
   //احصل على نص الرسالة
   let msg = e.target.elements.msg.value;
@@ -65,6 +67,7 @@ function outputMessage(message) {
   para.innerText = message.text;
   div.appendChild(para);
   document.querySelector('.chat-messages').appendChild(div);
+
 }
 
 //أضف اسم الغرفة إلى DOM
@@ -80,6 +83,7 @@ function outputUsers(users) {
     const li = document.createElement('li');
     li.innerText = user.username;
     userList.appendChild(li);
+
   });
 }
 
