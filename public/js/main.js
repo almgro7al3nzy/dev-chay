@@ -4,17 +4,17 @@ const roomNumber = document.getElementById('room-name');
 const userList = document.getElementById('users');
 
 //احصل على اسم المستخدم والغرفة من URL
-const { username, room } = Qs.parse(location.search, {
+const { nickname, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
 
-console.log({username, room})
+console.log({nickname, room})
 
 const socket = io();
 
 //انضم إلى غرف الدردشة
-socket.emit('joinRoom', { username, room });
-      socket.emit('add user', username);
+socket.emit('joinRoom', { nickname, room });
+      socket.emit('add user', nickname);
 
 //احصل على الغرفة والمستخدمين
 socket.on('roomUsers', ({ room, users }) => {
@@ -34,7 +34,7 @@ socket.on('message', (message) => {
 //إرسال الرسالة
 chatForm.addEventListener('submit', (e) => {
   e.preventDefault();
-    socket.emit('add user', username);
+    socket.emit('add user', nickname);
 
   //احصل على نص الرسالة
   let msg = e.target.elements.msg.value;
@@ -59,7 +59,7 @@ function outputMessage(message) {
   div.classList.add('message');
   const p = document.createElement('p');
   p.classList.add('meta');
-  p.innerText = message.username;
+  p.innerText = message.nickname;
   p.innerHTML += `<span>${message.time}</span>`;
   div.appendChild(p);
   const para = document.createElement('p');
@@ -81,7 +81,7 @@ function outputUsers(users) {
   userList.innerHTML = '';
   users.forEach((user) => {
     const li = document.createElement('li');
-    li.innerText = user.username;
+    li.innerText = user.nickname;
     userList.appendChild(li);
 
   });

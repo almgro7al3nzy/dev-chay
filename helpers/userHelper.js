@@ -1,8 +1,8 @@
 const users = [];
 
 //انضم إلى المستخدم للدردشة
-function newUser(id, username, room) {
-  const user = { id, username, room };
+function newUser(id, nickname, room) {
+  const user = { id, nickname, room };
 
   users.push(user);
 
