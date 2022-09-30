@@ -8,7 +8,9 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const general = io.of("/general");
+const football = io.of("/football");
+const basketball = io.of("/basketball");
 
 const socketio = require('socket.io')
 var app = express();
