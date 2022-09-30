@@ -2,7 +2,10 @@ const chatForm = document.getElementById('chat-form');
 const chatMessages = document.querySelector('.chat-messages');
 const roomNumber = document.getElementById('room-name');
 const userList = document.getElementById('users');
-
+const general = io.of("/general");
+const football = io.of("/football");
+const basketball = io.of("/basketball");
+var people = {};
 //احصل على اسم المستخدم والغرفة من URL
 const { nickname, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
